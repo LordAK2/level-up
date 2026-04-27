@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Youthopia'25 - Login</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="../theme.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Raleway:wght@100&display=swap" rel="stylesheet">
+
+    <!--NEW ADDED-->
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <script src="https://kit.fontawesome.com/0d4a4744bb.js" crossorigin="anonymous"></script>
+    <link rel="icon" href="../logo.png ">
+    <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@300;400;500&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <!--TILL HERE-->
+    <style>
+        body::before {
+            content: "";
+            position: fixed;
+            inset: 0;
+            pointer-events: none;
+            background:
+                radial-gradient(circle at 16% 18%, rgba(18, 216, 250, 0.17), transparent 36%),
+                radial-gradient(circle at 82% 78%, rgba(166, 255, 203, 0.12), transparent 40%);
+            z-index: 0;
+        }
+        .above, .heading, .form, .footer-container, .side-nav {
+            position: relative;
+            z-index: 1;
+        }
+        .heading .h1 {
+            letter-spacing: 1px;
+            text-shadow: 0 8px 24px rgba(0, 0, 0, 0.45);
+            animation: fadeUp 0.7s ease both;
+        }
+        .login-container {
+            width: min(92%, 470px);
+            margin: 20px auto 34px;
+            padding: 26px 24px;
+            border-radius: 18px;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            box-shadow: 0 14px 40px rgba(0, 0, 0, 0.35);
+            animation: fadeUp 0.65s ease both;
+        }
+        .login-container label {
+            display: block;
+            color: #fff;
+            font-family: 'Montserrat', sans-serif;
+            font-weight: 500;
+            margin-bottom: 8px;
+        }
+        .login-container input {
+            width: 100%;
+            box-sizing: border-box;
+            border-radius: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.16);
+            background: rgba(255, 255, 255, 0.96);
+            padding: 12px;
+            margin-bottom: 12px;
+            transition: box-shadow 0.25s ease, border-color 0.25s ease;
+        }
+        .login-container input:focus {
+            outline: none;
+            border-color: rgba(18, 216, 250, 0.6);
+            box-shadow: 0 0 0 3px rgba(18, 216, 250, 0.2);
+        }
+        .btn-submit, .btn-secondary {
+            border-radius: 12px;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+        .btn-submit:hover, .btn-secondary:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 10px 26px rgba(0, 0, 0, 0.3);
+        }
+        .divider span {
+            color: rgba(255, 255, 255, 0.9);
+            font-weight: 600;
+        }
+        .auth-message {
+            min-height: 22px;
+            margin-top: 10px;
+            font-family: 'Montserrat', sans-serif;
+            font-weight: 500;
+        }
+        @keyframes fadeUp {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        @media (max-width: 768px) {
+            .main-nav-list {
+                flex-wrap: wrap;
+                justify-content: center;
+                gap: 6px;
+            }
+            .login-container {
+                width: calc(100% - 24px);
+                padding: 18px 14px;
+                border-radius: 14px;
+            }
+            .login-container input {
+                font-size: 15px;
+                padding: 11px 10px;
+            }
+            .btn-submit, .btn-secondary {
+                width: 100%;
+                padding: 12px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <main class="above">
+        <nav class="main-nav">
+            <ul class="main-nav-list">
+                <a href="../index.html">
+                    <li class="main-nav-item btn from-top">HOME</li>
+                </a><a href="../about/index.html">
+                    <li class="main-nav-item btn from-top">ABOUT</li>
+               
+                </a><a href="../BOOKINGS/index.html">
+                    <li class="main-nav-item btn from-top">BOOKINGS</li>
+                </a><a href="../Login/index.html">
+                    <li class="main-nav-item btn from-top">LOGIN</li>
+                </a>
+            </ul>
+        </nav>
+        <hr>
+    </main>
+    <br>
+    <br>
+    <br>
+    <section class="heading" id="heading">
+        <h1 class="h1">LOGIN</h1>
+    </section>
+    <section class="form">
+        <div class="login-container">
+            <!-- Supabase logic will handle showing/hiding this -->
+            <div id="auth-phone-section">
+                <label for="phone">Phone Number</label>
+                <input type="tel" id="phone" placeholder="+1234567890" required>
+                <button type="button" id="send-otp-btn" class="btn-submit">Send OTP</button>
+            </div>
+
+            <div id="auth-otp-section" style="display: none;">
+                <label for="otp">Enter OTP</label>
+                <input type="text" id="otp" placeholder="123456" required>
+                <button type="button" id="verify-otp-btn" class="btn-submit">Verify OTP</button>
+            </div>
+
+            <div class="divider">
+                <span>OR</span>
+            </div>
+
+            <button type="button" id="google-login-btn" class="btn-secondary google-btn">
+                <img src="https://upload.wikimedia.org/wikipedia/commons/5/53/Google_%22G%22_Logo.svg" alt="Google"
+                    width="20">
+                Continue with Google
+            </button>
+
+            <p id="auth-message" class="auth-message"></p>
+        </div>
+    </section>
+
+    <!-- Supabase JS SDK -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script>
+        // ADD YOUR SUPABASE CREDENTIALS HERE
+        const supabaseUrl = 'https://fgzejzruaupvbbehjitm.supabase.co';
+        const supabaseKey = 'sb_publishable_E9c-nQPGpchvgMkOqGql-A_1staD1u7';
+        const supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
+
+        const phoneSection = document.getElementById('auth-phone-section');
+        const otpSection = document.getElementById('auth-otp-section');
+        const phoneInput = document.getElementById('phone');
+        const otpInput = document.getElementById('otp');
+        const sendOtpBtn = document.getElementById('send-otp-btn');
+        const verifyOtpBtn = document.getElementById('verify-otp-btn');
+        const googleLoginBtn = document.getElementById('google-login-btn');
+        const authMessage = document.getElementById('auth-message');
+
+        function showMessage(msg, isError = false) {
+            authMessage.textContent = msg;
+            authMessage.style.color = isError ? '#ff4757' : '#2ed573';
+        }
+
+        // Phone OTP Flow
+        sendOtpBtn.addEventListener('click', async () => {
+            const phone = phoneInput.value.trim();
+            if (!phone) {
+                showMessage('Please enter a valid phone number with country code.', true);
+                return;
+            }
+
+            showMessage('Sending OTP...', false);
+            const { error } = await supabase.auth.signInWithOtp({
+                phone: phone,
+            });
+
+            if (error) {
+                showMessage(error.message, true);
+            } else {
+                showMessage('OTP sent! Please check your messages.', false);
+                phoneSection.style.display = 'none';
+                otpSection.style.display = 'block';
+            }
+        });
+
+        verifyOtpBtn.addEventListener('click', async () => {
+            const phone = phoneInput.value.trim();
+            const token = otpInput.value.trim();
+            if (!token) {
+                showMessage('Please enter the OTP.', true);
+                return;
+            }
+
+            showMessage('Verifying...', false);
+            const { data, error } = await supabase.auth.verifyOtp({
+                phone,
+                token,
+                type: 'sms'
+            });
+
+            if (error) {
+                showMessage(error.message, true);
+            } else {
+                showMessage('Login successful! Redirecting...', false);
+                setTimeout(() => {
+                    window.location.href = '../BOOKINGS/index.html';
+                }, 1500);
+            }
+        });
+
+        // Google OAuth Flow
+        googleLoginBtn.addEventListener('click', async () => {
+            showMessage('Redirecting to Google...', false);
+            let redirectUrl = window.location.origin + window.location.pathname.replace('/Login/index.html', '/BOOKINGS/index.html');
+            if (window.location.origin === 'null' || window.location.origin.includes('file://')) {
+                redirectUrl = 'http://localhost:5500/Youthopia%202025%20Website%20-%20main/BOOKINGS/index.html'; // Fallback for local files
+            }
+            const { data, error } = await supabase.auth.signInWithOAuth({
+                provider: 'google',
+                options: {
+                    redirectTo: redirectUrl
+                }
+            });
+
+            if (error) {
+                showMessage(error.message, true);
+            }
+        });
+
+        // Check if user is already logged in
+        window.onload = async () => {
+            const { data: { session } } = await supabase.auth.getSession();
+            if (session) {
+                showMessage('You are already logged in. Redirecting...', false);
+                setTimeout(() => {
+                    window.location.href = '../BOOKINGS/index.html';
+                }, 1500);
+            }
+        };
+    </script>
+    <!--New Added-->
+    <nav class="side-nav">
+        <div class="overlay"></div>
+        <button class="but-nav">
+            <i class="material-icons">menu</i>
+        </button>
+        <div class="nav-column">
+            <ul class="side-nav-list">
+                <li><i class="material-icons close-nav">close</i></li>
+                <hr class="nav-hr">
+                <a href="../index.html">
+                    <li class="li-side btn from-top">HOME</li>
+                </a>
+                <hr class="nav-hr">
+                <a href="../about/index.html">
+                    <li class="li-side btn from-top">ABOUT</li>
+                </a>
+                
+
+                
+                <hr class="nav-hr">
+
+                <a href="../Login/index.html">
+                    <li class="li-side btn from-top">LOGIN</li>
+                </a>
+                <hr class="nav-hr">
+
+
+            </ul>
+        </div>
+    </nav>
+    </nav>
+    <div class="gap"></div>
+    <footer class="footer-container">
+        <div class="footer">
+
+
+            <h2 id="footer-h2">Copyright â’¸ YOUTHOPIA-2025 | All rights reserved </h2>
+        </div>
+        <div class="social">
+            <a href="https://www.instagram.com/youthopia_25?igsh=MTB2a2o3emxkbmVreA=="><i
+                    class="fab fa-instagram"></i></a>
+        </div>
+        </div>
+    </footer>
+
+</body>
+
+</html>

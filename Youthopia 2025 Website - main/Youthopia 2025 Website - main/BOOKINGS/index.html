@@ -1,0 +1,637 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Game Zone - BOOKINGS</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Raleway:wght@100&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../style.css">
+    <link rel="stylesheet" href="../theme.css">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <style>
+        :root {
+            --accent-cyan: #12d8fa;
+            --accent-green: #4cd137;
+            --accent-red: #e84118;
+            --glass-bg: rgba(255, 255, 255, 0.1);
+            --glass-border: rgba(255, 255, 255, 0.22);
+            --text-light: #f5f8ff;
+        }
+        body {
+            overflow-x: hidden;
+        }
+        body::before {
+            content: "";
+            position: fixed;
+            inset: 0;
+            pointer-events: none;
+            background:
+                radial-gradient(circle at 15% 20%, rgba(18, 216, 250, 0.18), transparent 40%),
+                radial-gradient(circle at 85% 75%, rgba(166, 255, 203, 0.12), transparent 42%);
+            animation: ambientPulse 9s ease-in-out infinite alternate;
+            z-index: 0;
+        }
+        .above {
+            position: relative;
+            z-index: 1;
+        }
+        .heading .h1 {
+            letter-spacing: 1px;
+            text-shadow: 0 8px 30px rgba(0, 0, 0, 0.45);
+            animation: slideFadeIn 0.8s ease both;
+        }
+        .booking-container {
+            background: var(--glass-bg);
+            backdrop-filter: blur(14px);
+            -webkit-backdrop-filter: blur(14px);
+            border-radius: 22px;
+            padding: 34px;
+            width: min(92%, 720px);
+            margin: 42px auto 56px;
+            border: 1px solid var(--glass-border);
+            box-shadow: 0 14px 45px rgba(0, 0, 0, 0.38);
+            animation: cardReveal 0.75s ease both;
+            transform-origin: center top;
+        }
+        .form-group {
+            margin-bottom: 20px;
+            text-align: left;
+            animation: slideFadeIn 0.55s ease both;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-size: 18px;
+            font-family: 'Montserrat', sans-serif;
+            color: var(--text-light);
+            font-weight: 500;
+            letter-spacing: 0.2px;
+        }
+        .form-control {
+            width: 100%;
+            padding: 12px;
+            border-radius: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.14);
+            background: rgba(255, 255, 255, 0.96);
+            font-size: 16px;
+            font-family: 'Montserrat', sans-serif;
+            color: #333;
+            box-sizing: border-box;
+            transition: box-shadow 0.25s ease, transform 0.25s ease, border-color 0.25s ease;
+        }
+        .form-control:focus {
+            outline: none;
+            border-color: rgba(18, 216, 250, 0.6);
+            box-shadow: 0 0 0 3px rgba(18, 216, 250, 0.18);
+            transform: translateY(-1px);
+        }
+        .btn-submit {
+            background: linear-gradient(45deg, #1fa2ff, #12d8fa, #a6ffcb);
+            color: #000;
+            font-weight: bold;
+            font-size: 18px;
+            padding: 15px 30px;
+            border: none;
+            border-radius: 12px;
+            cursor: pointer;
+            width: 100%;
+            margin-top: 20px;
+            transition: transform 0.25s ease, box-shadow 0.25s ease, filter 0.25s ease;
+            box-shadow: 0 10px 24px rgba(18, 216, 250, 0.25);
+        }
+        .btn-submit:hover {
+            filter: brightness(1.02);
+            transform: translateY(-1px) scale(1.01);
+            box-shadow: 0 14px 30px rgba(18, 216, 250, 0.33);
+        }
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.2);
+            color: #fff;
+            padding: 10px 20px;
+            border: 1px solid white;
+            border-radius: 8px;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+        #availability-results {
+            margin-top: 20px;
+            padding: 16px;
+            background: rgba(0, 0, 0, 0.42);
+            border-radius: 14px;
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            display: none;
+            animation: slideFadeIn 0.5s ease both;
+        }
+        #slots-wrapper {
+            margin-top: 10px;
+            overflow-x: auto;
+        }
+        .slots-grid {
+            width: 100%;
+            border-collapse: collapse;
+            table-layout: fixed;
+            margin-top: 8px;
+            min-width: 420px;
+        }
+        .slots-grid td {
+            border: 1px solid rgba(255, 255, 255, 0.25);
+            padding: 10px 8px;
+            text-align: center;
+            font-family: 'Montserrat', sans-serif;
+            font-size: 14px;
+            cursor: pointer;
+            transition: transform 0.15s ease, opacity 0.15s ease;
+        }
+        .slot-available-cell {
+            background: rgba(76, 209, 55, 0.85);
+            color: #102b10;
+            font-weight: 700;
+        }
+        .slot-available-cell:hover {
+            transform: translateY(-1px);
+            filter: brightness(1.03);
+            box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.24);
+        }
+        .slot-full-cell {
+            background: rgba(232, 65, 24, 0.85);
+            color: #fff;
+            cursor: not-allowed;
+            opacity: 0.95;
+        }
+        .slot-selected {
+            outline: 2px solid #fff;
+            transform: scale(1.03);
+        }
+        #selectedSlotInfo {
+            margin-top: 10px;
+            color: #fff;
+            font-family: 'Montserrat', sans-serif;
+            font-size: 14px;
+            min-height: 20px;
+        }
+        @keyframes slideFadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes cardReveal {
+            from { opacity: 0; transform: translateY(18px) scale(0.99); }
+            to { opacity: 1; transform: translateY(0) scale(1); }
+        }
+        @keyframes ambientPulse {
+            from { opacity: 0.6; }
+            to { opacity: 1; }
+        }
+        @media (max-width: 992px) {
+            .booking-container {
+                width: min(94%, 680px);
+                padding: 28px 24px;
+                margin-top: 30px;
+            }
+            .heading .h1 {
+                font-size: clamp(28px, 5.6vw, 44px);
+            }
+        }
+        @media (max-width: 768px) {
+            .booking-container {
+                width: calc(100% - 24px);
+                padding: 20px 16px;
+                border-radius: 16px;
+                margin: 20px auto 32px;
+            }
+            .form-group label {
+                font-size: 16px;
+            }
+            .form-control {
+                font-size: 15px;
+                padding: 11px 10px;
+                border-radius: 10px;
+            }
+            .btn-submit {
+                font-size: 16px;
+                padding: 13px 16px;
+            }
+            .slots-grid {
+                min-width: 320px;
+            }
+            .slots-grid td {
+                font-size: 13px;
+                padding: 9px 6px;
+            }
+            #selectedSlotInfo {
+                font-size: 13px;
+            }
+            .main-nav-list {
+                flex-wrap: wrap;
+                justify-content: center;
+                gap: 6px;
+            }
+        }
+        @media (max-width: 480px) {
+            .booking-container {
+                width: calc(100% - 14px);
+                padding: 16px 12px;
+            }
+            .slots-grid {
+                min-width: 280px;
+            }
+            .slots-grid td {
+                font-size: 12px;
+                line-height: 1.3;
+            }
+        }
+        .slot-available { color: #4cd137; font-weight: bold; }
+        .slot-full { color: #e84118; font-weight: bold; }
+    </style>
+</head>
+<body>
+    <main class="above">
+        <nav class="main-nav">
+            <ul class="main-nav-list">
+                <a href="../index.html"><li class="main-nav-item btn from-top">HOME</li></a>
+                <a href="../about/index.html"><li class="main-nav-item btn from-top">ABOUT</li></a>
+                
+                <a href="../BOOKINGS/index.html"><li class="main-nav-item btn from-top">BOOKINGS</li></a>
+                <a href="../Login/index.html"><li class="main-nav-item btn from-top">LOGIN</li></a>
+            </ul>
+        </nav> 
+        
+        <section class="heading">
+            <h1 class="h1" style="margin-top: 30px;">BOOK A TABLE</h1>
+        </section>
+
+        <div class="booking-container">
+            <form id="bookingForm">
+                <div class="form-group">
+                    <label>Select Activity</label>
+                    <select id="activity" class="form-control" required>
+                        <option value="">Loading activities...</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Select Date</label>
+                    <input type="date" id="date" class="form-control" required>
+                </div>
+
+                <div id="availability-results">
+                    <div class="form-group">
+                        <label>Available Time Slots</label>
+                        <div id="slots-wrapper"></div>
+                        <div id="selectedSlotInfo">Select an available slot to continue.</div>
+                        <input type="hidden" id="timeSlot" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Your Name</label>
+                        <input type="text" id="customerName" class="form-control" placeholder="John Doe" required>
+                    </div>
+                    <button type="submit" class="btn-submit">Confirm Booking</button>
+                </div>
+            </form>
+        </div>
+    </main>
+
+    <footer class="footer-container">
+        <div class="footer">
+            <h2 id="footer-h2"><a href="#">Copyright Ⓒ Level Up Activities | All rights reserved</a></h2>
+        </div>
+    </footer> 
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+    <script>
+        // Replace these with your Supabase project values.
+        const SUPABASE_URL = 'https://fgzejzruaupvbbehjitm.supabase.co';
+        const SUPABASE_ANON_KEY = 'sb_publishable_E9c-nQPGpchvgMkOqGql-A_1staD1u7';
+        const BOOKING_AMOUNT_INR = 200;
+        const RAZORPAY_FUNCTION_NAME = 'razorpay-booking';
+        function generateHalfHourSlots() {
+            const slots = [];
+            for (let minutes = 12 * 60; minutes < 23 * 60; minutes += 30) {
+                const hour = String(Math.floor(minutes / 60)).padStart(2, '0');
+                const minute = String(minutes % 60).padStart(2, '0');
+                slots.push(`${hour}:${minute}`);
+            }
+            return slots;
+        }
+
+        const DEFAULT_SLOTS = generateHalfHourSlots();
+        const DEFAULT_MAX_TABLES = 1;
+        const isSupabaseConfigured =
+            SUPABASE_URL.includes('supabase.co') &&
+            !SUPABASE_URL.includes('YOUR_PROJECT_REF') &&
+            SUPABASE_ANON_KEY &&
+            !SUPABASE_ANON_KEY.includes('YOUR_SUPABASE_ANON_KEY');
+
+        const supabaseClient = isSupabaseConfigured
+            ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
+            : null;
+
+        function normalizeTimeSlots(timeSlots) {
+            if (Array.isArray(timeSlots) && timeSlots.length) return timeSlots;
+            if (typeof timeSlots === 'string' && timeSlots.trim()) {
+                return timeSlots.split(',').map((slot) => slot.trim()).filter(Boolean);
+            }
+            return DEFAULT_SLOTS;
+        }
+
+        function toDisplayTime(time24) {
+            const [hRaw, mRaw] = String(time24).split(':');
+            const h = Number(hRaw);
+            const m = mRaw || '00';
+            const suffix = h >= 12 ? 'PM' : 'AM';
+            const hour12 = h % 12 === 0 ? 12 : h % 12;
+            return `${hour12}:${m} ${suffix}`;
+        }
+
+        function renderSlotsTable(timeSlots, bookingCountBySlot, maxTables) {
+            const wrapper = document.getElementById('slots-wrapper');
+            const hiddenTimeSlotInput = document.getElementById('timeSlot');
+            const selectedSlotInfo = document.getElementById('selectedSlotInfo');
+            hiddenTimeSlotInput.value = '';
+            selectedSlotInfo.textContent = 'Select an available slot to continue.';
+
+            if (!timeSlots.length) {
+                wrapper.innerHTML = '<p style="color:#fff;">No slots configured.</p>';
+                return false;
+            }
+
+            let hasAvailable = false;
+            let html = '<table class="slots-grid"><tbody>';
+            const cols = 4;
+
+            timeSlots.forEach((slotTime, index) => {
+                if (index % cols === 0) html += '<tr>';
+                const booked = bookingCountBySlot[slotTime] || 0;
+                const tablesAvailable = Math.max(maxTables - booked, 0);
+                const isAvailable = tablesAvailable > 0;
+                const cls = isAvailable ? 'slot-available-cell' : 'slot-full-cell';
+                if (isAvailable) hasAvailable = true;
+                html += `<td class="${cls}" data-time="${slotTime}" data-available="${isAvailable}">
+                    ${toDisplayTime(slotTime)}<br>${isAvailable ? 'Available' : 'Booked'}
+                </td>`;
+                if (index % cols === cols - 1) html += '</tr>';
+            });
+
+            if (timeSlots.length % cols !== 0) {
+                const remaining = cols - (timeSlots.length % cols);
+                for (let i = 0; i < remaining; i += 1) html += '<td style="background:transparent;border:none;"></td>';
+                html += '</tr>';
+            }
+
+            html += '</tbody></table>';
+            wrapper.innerHTML = html;
+
+            wrapper.querySelectorAll('td[data-available="true"]').forEach((cell) => {
+                cell.addEventListener('click', () => {
+                    wrapper.querySelectorAll('.slot-selected').forEach((selected) => selected.classList.remove('slot-selected'));
+                    cell.classList.add('slot-selected');
+                    const time = cell.getAttribute('data-time') || '';
+                    hiddenTimeSlotInput.value = time;
+                    selectedSlotInfo.textContent = `Selected: ${toDisplayTime(time)}`;
+                });
+            });
+
+            return hasAvailable;
+        }
+
+        // Load activities on page load
+        document.addEventListener('DOMContentLoaded', async () => {
+            const activitySelect = document.getElementById('activity');
+            const requestedActivity = (new URLSearchParams(window.location.search).get('activity') || '').trim();
+            const fallbackActivities = [
+                { id: '8-ball-pool', name: '8-ball pool' },
+                { id: 'fooseball', name: 'fooseball' },
+                { id: 'airhockey', name: 'airhockey' }
+            ];
+
+            const renderActivities = (activities) => {
+                activitySelect.innerHTML = '<option value="">Choose an activity...</option>';
+                activities.forEach((act) => {
+                    const option = document.createElement('option');
+                    const value = act.id ?? act.activity_id ?? act.name ?? '';
+                    const label = act.name ?? act.activity_name ?? String(value);
+                    option.value = value;
+                    option.textContent = label;
+                    activitySelect.appendChild(option);
+                });
+
+                if (requestedActivity) {
+                    const exists = Array.from(activitySelect.options).some(
+                        (opt) => String(opt.value).toLowerCase() === requestedActivity.toLowerCase()
+                    );
+                    if (exists) activitySelect.value = requestedActivity;
+                }
+            };
+
+            try {
+                if (!supabaseClient) {
+                    throw new Error('Supabase credentials are not configured.');
+                }
+
+                const { data: activities, error } = await supabaseClient
+                    .from('activities')
+                    .select('id, name')
+                    .order('name', { ascending: true });
+
+                if (error) throw error;
+                if (!activities || !activities.length) {
+                    throw new Error('No activities found in Supabase.');
+                }
+
+                renderActivities(activities);
+            } catch (err) {
+                console.error(err);
+                // Keep the form usable even if Supabase is not ready yet.
+                renderActivities(fallbackActivities);
+                if (!supabaseClient) {
+                    alert('Set SUPABASE_URL and SUPABASE_ANON_KEY in BOOKINGS/index.html to use cloud booking data.');
+                }
+            }
+
+            // Set min date to today
+            const today = new Date().toISOString().split('T')[0];
+            document.getElementById('date').min = today;
+
+            // Trigger availability as soon as date changes.
+            document.getElementById('date').addEventListener('change', () => {
+                const activityId = document.getElementById('activity').value;
+                if (!activityId) {
+                    alert('Please select an activity first.');
+                    return;
+                }
+                checkAvailability();
+            });
+
+            document.getElementById('activity').addEventListener('change', () => {
+                const date = document.getElementById('date').value;
+                if (date) checkAvailability();
+            });
+        });
+
+        // Check availability
+        async function checkAvailability() {
+            const date = document.getElementById('date').value;
+            const activityId = document.getElementById('activity').value;
+
+            if (!date || !activityId) {
+                alert('Please select both an activity and a date.');
+                return;
+            }
+
+            try {
+                if (!supabaseClient) {
+                    throw new Error('Supabase credentials are not configured.');
+                }
+
+                const { data: activity, error: activityError } = await supabaseClient
+                    .from('activities')
+                    .select('id, name, time_slots, max_tables')
+                    .eq('id', activityId)
+                    .single();
+
+                if (activityError) throw activityError;
+
+                const timeSlots = normalizeTimeSlots(activity?.time_slots);
+                const maxTables = Number(activity?.max_tables) || DEFAULT_MAX_TABLES;
+
+                const { data: dayBookings, error: bookingsError } = await supabaseClient
+                    .from('bookings')
+                    .select('start_time')
+                    .eq('activity_id', activityId)
+                    .eq('booking_date', date);
+
+                if (bookingsError) throw bookingsError;
+
+                const bookingCountBySlot = (dayBookings || []).reduce((acc, booking) => {
+                    const key = String(booking.start_time || '').trim();
+                    if (!key) return acc;
+                    acc[key] = (acc[key] || 0) + 1;
+                    return acc;
+                }, {});
+                
+                const hasAvailable = renderSlotsTable(timeSlots, bookingCountBySlot, maxTables);
+
+                document.getElementById('availability-results').style.display = 'block';
+
+                if (!hasAvailable) {
+                    alert('Sorry, there are no available slots for this date.');
+                }
+            } catch (err) {
+                console.error(err);
+                alert('Error fetching availability from Supabase. Check table setup and RLS policies.');
+            }
+        }
+
+        // Submit Booking
+        document.getElementById('bookingForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const activity_id = document.getElementById('activity').value;
+            const booking_date = document.getElementById('date').value;
+            const start_time = document.getElementById('timeSlot').value;
+            const customer_name = document.getElementById('customerName').value;
+
+            try {
+                if (!supabaseClient) {
+                    throw new Error('Supabase credentials are not configured.');
+                }
+                if (!window.Razorpay) {
+                    throw new Error('Razorpay SDK failed to load.');
+                }
+                if (!start_time) {
+                    alert('Please choose a time slot before confirming booking.');
+                    return;
+                }
+
+                // Re-check slot availability immediately before payment.
+                const { count, error: countError } = await supabaseClient
+                    .from('bookings')
+                    .select('*', { count: 'exact', head: true })
+                    .eq('activity_id', activity_id)
+                    .eq('booking_date', booking_date)
+                    .eq('start_time', start_time);
+
+                if (countError) throw countError;
+                if ((count || 0) >= 1) {
+                    alert('This slot is already booked. Please choose another slot.');
+                    checkAvailability();
+                    return;
+                }
+
+                const createOrderResponse = await fetch(
+                    `${SUPABASE_URL}/functions/v1/${RAZORPAY_FUNCTION_NAME}`,
+                    {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            action: 'create_order',
+                            amount: BOOKING_AMOUNT_INR,
+                            currency: 'INR',
+                            booking: { activity_id, booking_date, start_time, customer_name }
+                        })
+                    }
+                );
+                const createOrderData = await createOrderResponse.json();
+                if (!createOrderResponse.ok) {
+                    throw new Error(createOrderData?.error || 'Could not create Razorpay order.');
+                }
+
+                const options = {
+                    key: createOrderData.key_id,
+                    amount: createOrderData.amount,
+                    currency: 'INR',
+                    name: 'Level Up Activities',
+                    description: `${activity_id} | ${booking_date} ${start_time}`,
+                    order_id: createOrderData.order_id,
+                    prefill: { name: customer_name },
+                    theme: { color: '#12d8fa' },
+                    handler: async function (paymentResponse) {
+                        try {
+                            const verifyResponse = await fetch(
+                                `${SUPABASE_URL}/functions/v1/${RAZORPAY_FUNCTION_NAME}`,
+                                {
+                                    method: 'POST',
+                                    headers: { 'Content-Type': 'application/json' },
+                                    body: JSON.stringify({
+                                        action: 'verify_and_book',
+                                        booking: { activity_id, booking_date, start_time, customer_name },
+                                        payment: {
+                                            razorpay_order_id: paymentResponse?.razorpay_order_id,
+                                            razorpay_payment_id: paymentResponse?.razorpay_payment_id,
+                                            razorpay_signature: paymentResponse?.razorpay_signature
+                                        }
+                                    })
+                                }
+                            );
+                            const verifyData = await verifyResponse.json();
+                            if (!verifyResponse.ok || !verifyData?.success) {
+                                throw new Error(verifyData?.error || 'Payment verification failed.');
+                            }
+
+                            alert('Payment successful and booking confirmed!');
+                            document.getElementById('customerName').value = '';
+                            document.getElementById('timeSlot').value = '';
+                            document.getElementById('selectedSlotInfo').textContent = 'Select an available slot to continue.';
+                            checkAvailability();
+                        } catch (dbErr) {
+                            console.error(dbErr);
+                            alert('Payment captured, but booking save failed. Contact support with your payment ID.');
+                        }
+                    }
+                };
+
+                const razorpayCheckout = new Razorpay(options);
+                razorpayCheckout.on('payment.failed', function () {
+                    alert('Payment failed or cancelled. Booking not created.');
+                });
+                razorpayCheckout.open();
+            } catch (err) {
+                console.error(err);
+                alert(`Error submitting booking: ${err.message || 'Unknown error'}`);
+            }
+        });
+    </script>
+</body>
+</html>

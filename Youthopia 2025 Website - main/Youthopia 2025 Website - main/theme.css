@@ -1,0 +1,64 @@
+:root {
+    --premium-cyan: #12d8fa;
+    --premium-green: #4cd137;
+    --premium-red: #e84118;
+    --premium-surface: rgba(255, 255, 255, 0.1);
+    --premium-border: rgba(255, 255, 255, 0.2);
+    --premium-text: #f5f8ff;
+}
+
+body {
+    overflow-x: hidden;
+}
+
+body::before {
+    content: "";
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    background:
+        radial-gradient(circle at 15% 20%, rgba(18, 216, 250, 0.15), transparent 35%),
+        radial-gradient(circle at 85% 80%, rgba(166, 255, 203, 0.12), transparent 40%);
+    z-index: 0;
+    animation: ambientGlow 8s ease-in-out infinite alternate;
+}
+
+.above,
+.below,
+.heading,
+.form,
+.logo-container,
+.h2-container,
+.row,
+.footer-container,
+.side-nav {
+    position: relative;
+    z-index: 1;
+}
+
+.heading .h1 {
+    letter-spacing: 1px;
+    text-shadow: 0 8px 24px rgba(0, 0, 0, 0.45);
+    animation: fadeUp 0.7s ease both;
+}
+
+.main-nav-list {
+    gap: 6px;
+}
+
+@keyframes fadeUp {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes ambientGlow {
+    from { opacity: 0.55; }
+    to { opacity: 1; }
+}
+
+@media (max-width: 900px) {
+    .main-nav-list {
+        flex-wrap: wrap;
+        justify-content: center;
+    }
+}
