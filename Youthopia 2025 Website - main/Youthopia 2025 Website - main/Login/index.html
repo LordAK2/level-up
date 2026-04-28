@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login · Level Up Activities</title>
+    <link rel="icon" href="../assets/activities/pool.png">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@500;700;800&family=Outfit:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../theme.css">
+    <style>
+        .auth-wrap{min-height:calc(100vh - 72px - 100px);display:grid;place-items:center;padding:60px 0;}
+        .auth-grid{display:grid;grid-template-columns:1fr 1fr;gap:60px;max-width:1100px;width:100%;align-items:center;}
+        .auth-side h1{font-size:clamp(40px,6vw,72px);line-height:1;margin-bottom:18px;}
+        .auth-side p{color:var(--text-dim);font-size:16px;line-height:1.6;margin-bottom:24px;max-width:460px;}
+        .auth-perks{display:flex;flex-direction:column;gap:14px;margin-top:30px;}
+        .auth-perk{display:flex;gap:14px;align-items:flex-start;}
+        .auth-perk .ic{width:36px;height:36px;border-radius:10px;display:grid;place-items:center;background:var(--surface-strong);border:1px solid var(--border-strong);flex-shrink:0;}
+        .auth-perk h4{font-family:'Unbounded',sans-serif;font-size:15px;font-weight:600;margin-bottom:2px;}
+        .auth-perk p{font-size:13px;color:var(--text-dim);margin:0;}
+        .auth-card{padding:40px;max-width:440px;width:100%;justify-self:end;}
+        .auth-card h2{font-family:'Unbounded',sans-serif;font-size:24px;font-weight:700;margin-bottom:4px;}
+        .auth-card .sub{color:var(--text-dim);font-size:14px;margin-bottom:28px;}
+        .tabs{display:flex;gap:4px;padding:4px;background:var(--surface);border:1px solid var(--border);border-radius:999px;margin-bottom:22px;}
+        .tab{flex:1;padding:10px 16px;text-align:center;border-radius:999px;font-size:12px;font-weight:600;letter-spacing:0.12em;text-transform:uppercase;color:var(--text-dim);cursor:pointer;transition:all .2s ease;}
+        .tab.active{background:var(--grad-hot);color:var(--bg-0);}
+        .auth-field{margin-bottom:14px;}
+        .divider-or{display:flex;align-items:center;gap:14px;margin:22px 0;color:var(--text-mute);font-size:12px;letter-spacing:0.2em;}
+        .divider-or::before,.divider-or::after{content:"";flex:1;height:1px;background:var(--border);}
+        .google-btn{width:100%;display:flex;align-items:center;justify-content:center;gap:10px;padding:14px 16px;border-radius:999px;background:#fff;color:#111;font-weight:600;font-size:14px;border:1px solid var(--border-strong);cursor:pointer;transition:transform .2s ease;}
+        .google-btn:hover{transform:translateY(-1px);}
+        .auth-msg{margin-top:16px;font-size:13px;min-height:18px;}
+        .auth-msg.error{color:#ff8aa6;} .auth-msg.success{color:var(--neon-mint);}
+        @media(max-width:900px){.auth-grid{grid-template-columns:1fr;gap:40px;}.auth-card{justify-self:stretch;padding:28px 22px;}.auth-side{text-align:center;}.auth-perk{text-align:left;}.auth-wrap{padding:32px 0;}}
+    </style>
+</head>
+<body>
+<div class="lu-page">
+<nav class="lu-nav">
+    <a href="../index.html" class="lu-brand"><span class="lu-brand-mark">LU</span><span>LEVEL UP</span></a>
+    <ul class="lu-nav-links" id="navLinks">
+        <li><a href="../index.html" class="lu-nav-link">Home</a></li>
+        <li><a href="../about/index.html" class="lu-nav-link">About</a></li>
+        <li><a href="../index.html#games" class="lu-nav-link">Games</a></li>
+        <li><a href="../index.html#pricing" class="lu-nav-link">Pricing</a></li>
+        <li><a href="index.html" class="lu-nav-link active">Login</a></li>
+        <a href="../BOOKINGS/index.html" class="lu-nav-cta">Book Now</a>
+    </ul>
+    <button class="lu-nav-toggle" id="navToggle"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18M3 12h18M3 18h18"/></svg></button>
+</nav>
+
+<main class="lu-container">
+    <div class="auth-wrap">
+        <div class="auth-grid">
+            <div class="auth-side">
+                <div class="eyebrow" style="margin-bottom:16px;">Member access</div>
+                <h1>Level up your <span class="text-grad-hot">game.</span></h1>
+                <p>Sign in to track hours played, stack loyalty points, and unlock exclusive member-only slots.</p>
+                <div class="auth-perks">
+                    <div class="auth-perk"><div class="ic">⚡</div><div><h4>Priority booking</h4><p>Grab prime weekend slots 24 hours before everyone else.</p></div></div>
+                    <div class="auth-perk"><div class="ic">🏆</div><div><h4>Loyalty points</h4><p>Earn 1 point per minute played. Redeem for free sessions.</p></div></div>
+                    <div class="auth-perk"><div class="ic">🎁</div><div><h4>Birthday perk</h4><p>1 hour on any table, on the house. Every year.</p></div></div>
+                </div>
+            </div>
+
+            <div class="lu-card auth-card">
+                <h2>Welcome back</h2>
+                <div class="sub">Sign in with your phone or Google.</div>
+                <div class="tabs">
+                    <div class="tab active" data-tab="phone" id="tab-phone-btn">Phone OTP</div>
+                    <div class="tab" data-tab="email" id="tab-email-btn">Email</div>
+                </div>
+
+                <!-- Phone tab -->
+                <div id="tab-phone-content">
+                    <div class="auth-field" id="phoneStep">
+                        <label class="lu-label" for="phone">Phone number</label>
+                        <input type="tel" id="phone" class="lu-input" placeholder="+91 98765 43210">
+                    </div>
+                    <div class="auth-field" id="otpStep" style="display:none;">
+                        <label class="lu-label" for="otp">Enter the OTP sent to you</label>
+                        <input type="text" id="otp" class="lu-input" placeholder="6-digit code" maxlength="6">
+                    </div>
+                    <button class="lu-btn lu-btn-primary" id="sendOtpBtn" style="width:100%;">Send OTP →</button>
+                    <button class="lu-btn lu-btn-primary" id="verifyOtpBtn" style="width:100%;display:none;">Verify & Continue →</button>
+                </div>
+
+                <!-- Email tab -->
+                <div id="tab-email-content" style="display:none;">
+                    <div class="auth-field">
+                        <label class="lu-label" for="email">Email</label>
+                        <input type="email" id="email" class="lu-input" placeholder="you@example.com">
+                    </div>
+                    <div class="auth-field">
+                        <label class="lu-label" for="password">Password</label>
+                        <input type="password" id="password" class="lu-input" placeholder="••••••••">
+                    </div>
+                    <button class="lu-btn lu-btn-primary" id="emailLoginBtn" style="width:100%;">Sign In →</button>
+                </div>
+
+                <div class="divider-or"><span>OR</span></div>
+                <button class="google-btn" id="googleBtn">
+                    <svg width="18" height="18" viewBox="0 0 48 48"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/><path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/></svg>
+                    Continue with Google
+                </button>
+                <div class="auth-msg" id="authMsg"></div>
+            </div>
+        </div>
+    </div>
+</main>
+
+<footer class="lu-footer">
+    <div>© <span id="year"></span> Level Up Activities</div>
+    <div><a href="../index.html">← Back to home</a></div>
+</footer>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+    document.getElementById('navToggle')?.addEventListener('click',()=>document.getElementById('navLinks').classList.toggle('lu-nav-open'));
+    document.getElementById('year').textContent = new Date().getFullYear();
+
+    // Tabs
+    document.querySelectorAll('.tab').forEach(t=>t.addEventListener('click',()=>{
+        document.querySelectorAll('.tab').forEach(x=>x.classList.remove('active')); t.classList.add('active');
+        const id=t.dataset.tab;
+        document.getElementById('tab-phone-content').style.display=id==='phone'?'block':'none';
+        document.getElementById('tab-email-content').style.display=id==='email'?'block':'none';
+    }));
+
+    const msgEl=document.getElementById('authMsg');
+    const show=(t,kind='')=>{msgEl.textContent=t;msgEl.className='auth-msg '+kind;};
+
+    const SUPABASE_URL='https://fgzejzruaupvbbehjitm.supabase.co';
+    const SUPABASE_KEY='sb_publishable_E9c-nQPGpchvgMkOqGql-A_1staD1u7';
+    const sb=window.supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
+
+    document.getElementById('sendOtpBtn').addEventListener('click',async()=>{
+        const phone=document.getElementById('phone').value.trim();
+        if(!phone) return show('Please enter your phone number.','error');
+        show('Sending OTP…');
+        const{error}=await sb.auth.signInWithOtp({phone});
+        if(error) return show(error.message,'error');
+        show('OTP sent! Check your phone.','success');
+        document.getElementById('phoneStep').style.display='none';
+        document.getElementById('otpStep').style.display='block';
+        document.getElementById('sendOtpBtn').style.display='none';
+        document.getElementById('verifyOtpBtn').style.display='inline-flex';
+    });
+
+    document.getElementById('verifyOtpBtn').addEventListener('click',async()=>{
+        const phone=document.getElementById('phone').value.trim();
+        const token=document.getElementById('otp').value.trim();
+        if(!token) return show('Enter the OTP.','error');
+        const{error}=await sb.auth.verifyOtp({phone,token,type:'sms'});
+        if(error) return show(error.message,'error');
+        show('Signed in — redirecting…','success');
+        setTimeout(()=>location.href='../BOOKINGS/index.html',900);
+    });
+
+    document.getElementById('emailLoginBtn').addEventListener('click',async()=>{
+        const email=document.getElementById('email').value.trim();
+        const password=document.getElementById('password').value;
+        if(!email||!password) return show('Enter email and password.','error');
+        const{error}=await sb.auth.signInWithPassword({email,password});
+        if(error) return show(error.message,'error');
+        show('Signed in — redirecting…','success');
+        setTimeout(()=>location.href='../BOOKINGS/index.html',900);
+    });
+
+    document.getElementById('googleBtn').addEventListener('click',async()=>{
+        show('Redirecting to Google…');
+        const redirectTo=new URL('../BOOKINGS/index.html',location.href).href;
+        const{error}=await sb.auth.signInWithOAuth({provider:'google',options:{redirectTo}});
+        if(error) show(error.message,'error');
+    });
+
+    // Auto-redirect if already logged in
+    (async()=>{
+        const{data:{session}}=await sb.auth.getSession();
+        if(session){show('Already signed in — redirecting…','success');setTimeout(()=>location.href='../BOOKINGS/index.html',800);}
+    })();
+</script>
+</body>
+</html>

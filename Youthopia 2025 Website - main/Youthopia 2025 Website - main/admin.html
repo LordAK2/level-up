@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin · Level Up Activities</title>
+    <link rel="icon" href="assets/activities/pool.png">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@500;700;800&family=Outfit:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="theme.css">
+    <style>
+        .admin-grid{display:grid;grid-template-columns:2fr 1fr;gap:24px;padding:40px 0 80px;}
+        .admin-table{width:100%;border-collapse:separate;border-spacing:0 10px;}
+        .admin-table th{text-align:left;font-size:11px;letter-spacing:0.2em;text-transform:uppercase;color:var(--text-mute);padding:10px 14px;font-family:'JetBrains Mono',monospace;font-weight:600;}
+        .admin-table tbody tr{background:var(--surface);}
+        .admin-table td{padding:14px;border-top:1px solid var(--border);border-bottom:1px solid var(--border);}
+        .admin-table td:first-child{border-left:1px solid var(--border);border-radius:var(--radius-sm) 0 0 var(--radius-sm);}
+        .admin-table td:last-child{border-right:1px solid var(--border);border-radius:0 var(--radius-sm) var(--radius-sm) 0;text-align:right;}
+        .admin-table input{background:rgba(255,255,255,0.04);border:1px solid var(--border-strong);border-radius:8px;padding:8px 12px;color:var(--text);font-family:'JetBrains Mono',monospace;font-size:14px;width:100%;max-width:160px;}
+        .admin-table input:focus{outline:none;border-color:var(--neon-mint);background:rgba(0,255,198,0.05);}
+        .ok{color:var(--neon-mint);}
+        .kv{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+        .kv-item{background:var(--surface);border:1px solid var(--border);padding:16px;border-radius:var(--radius-sm);}
+        .kv-item .k{font-size:11px;letter-spacing:0.2em;text-transform:uppercase;color:var(--text-mute);}
+        .kv-item .v{font-family:'Unbounded',sans-serif;font-size:26px;font-weight:700;margin-top:4px;}
+        .login-gate{max-width:420px;margin:80px auto;padding:32px;text-align:center;}
+        @media(max-width:900px){.admin-grid{grid-template-columns:1fr;}}
+    </style>
+</head>
+<body>
+<div class="lu-page">
+<nav class="lu-nav">
+    <a href="index.html" class="lu-brand"><span class="lu-brand-mark">LU</span><span>LEVEL UP</span></a>
+    <ul class="lu-nav-links" id="navLinks">
+        <li><a href="index.html" class="lu-nav-link">Home</a></li>
+        <li><a href="BOOKINGS/index.html" class="lu-nav-link">Bookings</a></li>
+        <li><a href="admin.html" class="lu-nav-link active">Admin</a></li>
+        <a href="index.html" class="lu-nav-cta">← Exit</a>
+    </ul>
+    <button class="lu-nav-toggle" id="navToggle"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18M3 12h18M3 18h18"/></svg></button>
+</nav>
+
+<main class="lu-container">
+    <!-- Gate -->
+    <section id="gate" class="lu-card login-gate">
+        <div class="eyebrow" style="margin-bottom:12px;">Owner access</div>
+        <h1 style="font-size:32px;margin-bottom:8px;">Admin Panel</h1>
+        <p class="text-dim" style="margin-bottom:20px;font-size:14px;">Sign in with your Supabase admin account.</p>
+        <input type="email" id="gateEmail" class="lu-input" placeholder="admin@example.com" style="margin-bottom:12px;">
+        <input type="password" id="gatePassword" class="lu-input" placeholder="Password">
+        <button class="lu-btn lu-btn-primary" id="gateBtn" style="width:100%;margin-top:14px;">Sign In →</button>
+        <div id="gateMsg" style="margin-top:12px;font-size:13px;color:var(--text-dim);"></div>
+    </section>
+
+    <!-- Dashboard -->
+    <section id="dash" style="display:none;">
+        <div style="display:flex;justify-content:space-between;align-items:end;gap:20px;flex-wrap:wrap;padding-top:40px;">
+            <div>
+                <div class="eyebrow" style="margin-bottom:12px;">Dashboard</div>
+                <h1 style="font-size:clamp(32px,5vw,52px);">Manage your <span class="text-grad-cool">parlour</span>.</h1>
+            </div>
+            <button class="lu-btn lu-btn-ghost" id="logoutBtn">Logout</button>
+        </div>
+
+        <div class="admin-grid">
+            <div>
+                <div class="lu-card" style="padding:24px;">
+                    <h3 style="font-family:'Unbounded',sans-serif;font-weight:700;font-size:18px;margin-bottom:6px;">Activities & Pricing</h3>
+                    <p class="text-dim" style="font-size:13px;margin-bottom:20px;">Edit name, table count, and per-slot price (₹). Changes save on click.</p>
+                    <table class="admin-table">
+                        <thead><tr><th>Name</th><th>Tables</th><th>Price / 30min</th><th>Status</th></tr></thead>
+                        <tbody id="actTbody"><tr><td colspan="4" class="text-dim">Loading…</td></tr></tbody>
+                    </table>
+                    <div style="margin-top:16px;display:flex;gap:10px;align-items:center;flex-wrap:wrap;">
+                        <input type="text" id="newActName" class="lu-input" placeholder="New activity name" style="max-width:220px;">
+                        <input type="number" id="newActPrice" class="lu-input" placeholder="Price ₹" style="max-width:120px;">
+                        <input type="number" id="newActTables" class="lu-input" placeholder="Tables" style="max-width:100px;">
+                        <button class="lu-btn lu-btn-outline" id="addActBtn">+ Add</button>
+                    </div>
+                </div>
+                <div class="lu-card" style="padding:24px;margin-top:20px;">
+                    <h3 style="font-family:'Unbounded',sans-serif;font-weight:700;font-size:18px;margin-bottom:6px;">Recent Bookings</h3>
+                    <p class="text-dim" style="font-size:13px;margin-bottom:20px;">Latest 15 confirmed reservations.</p>
+                    <table class="admin-table">
+                        <thead><tr><th>When</th><th>Activity</th><th>Customer</th><th>Booked at</th></tr></thead>
+                        <tbody id="bookTbody"><tr><td colspan="4" class="text-dim">Loading…</td></tr></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <aside>
+                <div class="lu-card" style="padding:24px;">
+                    <h3 style="font-family:'Unbounded',sans-serif;font-weight:700;font-size:18px;margin-bottom:16px;">Today at a glance</h3>
+                    <div class="kv">
+                        <div class="kv-item"><div class="k">Bookings</div><div class="v" id="statBookings">—</div></div>
+                        <div class="kv-item"><div class="k">Revenue</div><div class="v" id="statRevenue">—</div></div>
+                        <div class="kv-item"><div class="k">Activities</div><div class="v" id="statActivities">—</div></div>
+                        <div class="kv-item"><div class="k">Upcoming</div><div class="v" id="statUpcoming">—</div></div>
+                    </div>
+                </div>
+                <div class="lu-card" style="padding:24px;margin-top:20px;">
+                    <h3 style="font-family:'Unbounded',sans-serif;font-weight:700;font-size:16px;margin-bottom:10px;">Quick tips</h3>
+                    <ul style="color:var(--text-dim);font-size:13px;line-height:1.7;padding-left:18px;">
+                        <li style="list-style:disc;">Prices apply per 30-minute slot.</li>
+                        <li style="list-style:disc;">Increase table count to allow parallel bookings.</li>
+                        <li style="list-style:disc;">Admin access requires a Supabase auth account with RLS write permission.</li>
+                    </ul>
+                </div>
+            </aside>
+        </div>
+    </section>
+</main>
+
+<footer class="lu-footer">
+    <div>© <span id="year"></span> Level Up Activities · Admin</div>
+    <div><a href="index.html">← Back to site</a></div>
+</footer>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+    const SUPABASE_URL = 'https://fgzejzruaupvbbehjitm.supabase.co';
+    const SUPABASE_KEY = 'sb_publishable_E9c-nQPGpchvgMkOqGql-A_1staD1u7';
+    const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+    document.getElementById('navToggle')?.addEventListener('click',()=>document.getElementById('navLinks').classList.toggle('lu-nav-open'));
+    document.getElementById('year').textContent = new Date().getFullYear();
+
+    const gateMsg = document.getElementById('gateMsg');
+    function gateErr(t){ gateMsg.textContent=t; gateMsg.style.color='#ff8aa6'; }
+
+    // ---- Auth ----
+    document.getElementById('gateBtn').addEventListener('click', async () => {
+        const email = document.getElementById('gateEmail').value.trim();
+        const password = document.getElementById('gatePassword').value;
+        if (!email || !password) return gateErr('Enter email and password.');
+        gateMsg.textContent = 'Signing in…'; gateMsg.style.color = 'var(--text-dim)';
+        const { error } = await sb.auth.signInWithPassword({ email, password });
+        if (error) return gateErr(error.message);
+        showDash();
+    });
+
+    document.getElementById('logoutBtn').addEventListener('click', async () => {
+        await sb.auth.signOut(); location.reload();
+    });
+
+    async function showDash() {
+        document.getElementById('gate').style.display = 'none';
+        document.getElementById('dash').style.display = 'block';
+        await Promise.all([loadActivities(), loadStats(), loadBookings()]);
+    }
+
+    // Auto-login if session already exists
+    (async () => {
+        const { data: { session } } = await sb.auth.getSession();
+        if (session) showDash();
+    })();
+
+    // ---- Activities ----
+    async function loadActivities() {
+        const tbody = document.getElementById('actTbody');
+        const { data: acts, error } = await sb.from('activities').select('*').order('name');
+        if (error || !acts) { tbody.innerHTML = '<tr><td colspan="4" class="text-dim">Failed to load.</td></tr>'; return; }
+        document.getElementById('statActivities').textContent = acts.filter(a => a.is_active).length;
+        if (!acts.length) { tbody.innerHTML = '<tr><td colspan="4" class="text-dim">No activities yet.</td></tr>'; return; }
+        tbody.innerHTML = acts.map(a => `
+            <tr data-id="${a.id}">
+                <td><input type="text" class="edit-name" value="${a.name}"></td>
+                <td><input type="number" class="edit-tables" min="1" value="${a.total_tables}"></td>
+                <td><input type="number" class="edit-price" min="0" value="${a.price_per_slot}"></td>
+                <td><span class="status text-dim" id="st-${a.id}">—</span>
+                    <button class="lu-btn lu-btn-ghost save-btn" style="padding:6px 12px;font-size:11px;margin-left:8px;">Save</button>
+                    <button class="lu-btn lu-btn-ghost del-btn" style="padding:6px 12px;font-size:11px;margin-left:4px;color:#ff8aa6;border-color:rgba(255,46,99,0.3);">Delete</button>
+                </td>
+            </tr>`).join('');
+        tbody.querySelectorAll('.save-btn').forEach(b => b.addEventListener('click', onSave));
+        tbody.querySelectorAll('.del-btn').forEach(b => b.addEventListener('click', onDelete));
+    }
+
+    async function onSave(e) {
+        const tr = e.target.closest('tr'), id = tr.dataset.id;
+        const name = tr.querySelector('.edit-name').value.trim();
+        const total_tables = Number(tr.querySelector('.edit-tables').value);
+        const price_per_slot = Number(tr.querySelector('.edit-price').value);
+        const st = document.getElementById(`st-${id}`);
+        st.textContent = 'Saving…'; st.className = 'status text-dim';
+        const { error } = await sb.from('activities').update({ name, total_tables, price_per_slot }).eq('id', id);
+        if (error) { st.textContent = '✗ ' + error.message; st.style.color = '#ff8aa6'; return; }
+        st.textContent = '✓ Saved'; st.className = 'status ok';
+        setTimeout(() => { st.textContent = ''; }, 1600);
+    }
+
+    async function onDelete(e) {
+        const tr = e.target.closest('tr'), id = tr.dataset.id;
+        if (!confirm('Deactivate this activity? Existing bookings remain.')) return;
+        await sb.from('activities').update({ is_active: false }).eq('id', id);
+        loadActivities();
+    }
+
+    document.getElementById('addActBtn').addEventListener('click', async () => {
+        const name = document.getElementById('newActName').value.trim();
+        const price_per_slot = Number(document.getElementById('newActPrice').value || 200);
+        const total_tables = Number(document.getElementById('newActTables').value || 1);
+        if (!name) return;
+        const { error } = await sb.from('activities').insert([{ name, price_per_slot, total_tables, is_active: true }]);
+        if (!error) {
+            document.getElementById('newActName').value = '';
+            document.getElementById('newActPrice').value = '';
+            document.getElementById('newActTables').value = '';
+            loadActivities();
+        }
+    });
+
+    // ---- Stats ----
+    async function loadStats() {
+        const today = new Date().toISOString().split('T')[0];
+        const { data: todayBookings } = await sb.from('bookings').select('activity_id, activities(price_per_slot)').eq('booking_date', today);
+        const { count: upcoming } = await sb.from('bookings').select('*', { count: 'exact', head: true }).gte('booking_date', today);
+        const revenue = (todayBookings || []).reduce((s, b) => s + (b.activities?.price_per_slot || 0), 0);
+        document.getElementById('statBookings').textContent = (todayBookings || []).length;
+        document.getElementById('statRevenue').textContent = '₹' + revenue;
+        document.getElementById('statUpcoming').textContent = upcoming || 0;
+    }
+
+    // ---- Bookings ----
+    async function loadBookings() {
+        const tbody = document.getElementById('bookTbody');
+        const { data: rows, error } = await sb
+            .from('bookings')
+            .select('*, activities(name)')
+            .order('created_at', { ascending: false })
+            .limit(15);
+        if (error || !rows || !rows.length) { tbody.innerHTML = '<tr><td colspan="4" class="text-dim">No bookings yet.</td></tr>'; return; }
+        tbody.innerHTML = rows.map(b => `<tr>
+            <td>${b.booking_date} · ${(b.start_time||'').substring(0,5)}</td>
+            <td>${b.activities?.name || b.activity_id}</td>
+            <td>${b.customer_name}</td>
+            <td class="text-dim">${new Date(b.created_at).toLocaleString()}</td>
+        </tr>`).join('');
+    }
+</script>
+</body>
+</html>

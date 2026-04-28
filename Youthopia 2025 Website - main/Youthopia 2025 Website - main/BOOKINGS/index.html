@@ -1,0 +1,339 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Book a Table · Level Up Activities</title>
+    <meta name="description" content="Book a 30-minute slot for 8-Ball Pool, Foosball, or Air Hockey at Level Up Activities.">
+    <link rel="icon" href="../assets/activities/pool.png">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@500;700;800&family=Outfit:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../theme.css">
+    <style>
+        .booking-wrap{display:grid;grid-template-columns:1.2fr 1fr;gap:32px;padding:48px 0 80px;}
+        .booking-header{margin-bottom:24px;}
+        .booking-header h1{font-size:clamp(36px,6vw,64px);margin-bottom:12px;}
+        .booking-header p{color:var(--text-dim);font-size:16px;max-width:520px;}
+        .booking-card{padding:32px;}
+        .booking-card h3{font-size:14px;text-transform:uppercase;letter-spacing:0.2em;color:var(--text-dim);margin-bottom:20px;font-family:'JetBrains Mono',monospace;font-weight:600;}
+        .field{margin-bottom:20px;}
+        .activity-chips{display:flex;gap:10px;flex-wrap:wrap;}
+        .chip{padding:12px 18px;border-radius:999px;background:rgba(255,255,255,0.03);border:1px solid var(--border-strong);color:var(--text-dim);cursor:pointer;font-size:13px;font-weight:500;letter-spacing:0.05em;transition:all .2s ease;}
+        .chip:hover{color:var(--text);border-color:var(--text);}
+        .chip.active{background:var(--grad-hot);color:var(--bg-0);border-color:transparent;font-weight:700;}
+
+        /* Calendar */
+        .calendar{margin-top:8px;}
+        .cal-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;}
+        .cal-title{font-family:'Unbounded',sans-serif;font-weight:700;font-size:18px;}
+        .cal-nav-btn{width:38px;height:38px;border-radius:50%;display:grid;place-items:center;background:var(--surface);border:1px solid var(--border-strong);color:var(--text);transition:all .2s ease;}
+        .cal-nav-btn:hover{background:var(--surface-strong);border-color:var(--neon-mint);color:var(--neon-mint);}
+        .cal-nav-btn:disabled{opacity:0.3;cursor:not-allowed;}
+        .cal-weekdays,.cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:6px;}
+        .cal-weekdays{margin-bottom:8px;}
+        .cal-weekdays span{text-align:center;font-size:10px;letter-spacing:0.2em;text-transform:uppercase;color:var(--text-mute);padding:6px 0;}
+        .cal-day{aspect-ratio:1;display:grid;place-items:center;border-radius:var(--radius-sm);background:rgba(255,255,255,0.02);border:1px solid transparent;font-family:'JetBrains Mono',monospace;font-size:14px;color:var(--text);cursor:pointer;transition:all .15s ease;position:relative;}
+        .cal-day.out{color:var(--text-mute);background:transparent;cursor:default;}
+        .cal-day.past{color:var(--text-mute);text-decoration:line-through;cursor:not-allowed;opacity:0.5;}
+        .cal-day.today{border-color:var(--neon-mint);color:var(--neon-mint);font-weight:700;}
+        .cal-day:not(.past):not(.out):hover{background:var(--surface-strong);transform:scale(1.05);}
+        .cal-day.selected{background:var(--grad-hot);color:var(--bg-0);font-weight:800;border-color:transparent;box-shadow:var(--shadow-glow-pink);}
+
+        /* Slots */
+        .slots-section{margin-top:24px;}
+        .slots-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;}
+        .slots-legend{display:flex;gap:14px;font-size:11px;color:var(--text-dim);}
+        .slots-legend span{display:inline-flex;align-items:center;gap:6px;}
+        .legend-dot{width:10px;height:10px;border-radius:3px;display:inline-block;}
+        .legend-dot.avail{background:rgba(0,255,198,0.5);border:1px solid var(--neon-mint);}
+        .legend-dot.sel{background:var(--neon-pink);}
+        .legend-dot.full{background:rgba(255,46,99,0.2);border:1px solid rgba(255,46,99,0.5);}
+        .slots-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;}
+        .slot{padding:12px 10px;border-radius:var(--radius-sm);background:rgba(0,255,198,0.08);border:1px solid rgba(0,255,198,0.3);color:var(--neon-mint);cursor:pointer;font-family:'JetBrains Mono',monospace;font-size:13px;text-align:center;transition:all .15s ease;}
+        .slot:hover{background:rgba(0,255,198,0.15);transform:translateY(-1px);}
+        .slot.selected{background:var(--neon-pink);color:var(--bg-0);border-color:var(--neon-pink);font-weight:700;box-shadow:var(--shadow-glow-pink);}
+        .slot.full{background:rgba(255,46,99,0.08);border-color:rgba(255,46,99,0.3);color:rgba(255,46,99,0.6);cursor:not-allowed;text-decoration:line-through;}
+        .slots-empty{color:var(--text-mute);text-align:center;padding:24px;font-size:14px;font-style:italic;}
+
+        /* Summary */
+        .summary-card{position:sticky;top:96px;padding:28px;}
+        .summary-line{display:flex;justify-content:space-between;padding:12px 0;border-bottom:1px dashed var(--border);font-size:14px;}
+        .summary-line:last-child{border-bottom:0;}
+        .summary-line strong{font-family:'Unbounded',sans-serif;font-weight:600;}
+        .summary-total{margin-top:16px;padding:18px;background:var(--surface-strong);border-radius:var(--radius-md);display:flex;justify-content:space-between;align-items:baseline;}
+        .summary-total .val{font-family:'Unbounded',sans-serif;font-size:32px;font-weight:800;}
+        .summary-total .val small{font-size:12px;color:var(--text-mute);margin-left:6px;font-family:'JetBrains Mono',monospace;font-weight:500;}
+        .message{margin-top:14px;padding:12px 14px;border-radius:var(--radius-sm);font-size:13px;display:none;}
+        .message.show{display:block;}
+        .message.error{background:rgba(255,46,99,0.1);border:1px solid rgba(255,46,99,0.4);color:#ff8aa6;}
+        .message.success{background:rgba(0,255,198,0.1);border:1px solid rgba(0,255,198,0.4);color:var(--neon-mint);}
+
+        @media(max-width:900px){.booking-wrap{grid-template-columns:1fr;padding:24px 0 48px;}.summary-card{position:static;}.booking-card{padding:22px;}.slots-grid{grid-template-columns:repeat(3,1fr);}}
+        @media(max-width:480px){.slots-grid{grid-template-columns:repeat(2,1fr);}.cal-day{font-size:12px;}.booking-card{padding:18px;border-radius:var(--radius-md);}.activity-chips .chip{padding:10px 14px;font-size:12px;}.summary-total .val{font-size:26px;}}
+    </style>
+</head>
+<body>
+<div class="lu-page">
+<nav class="lu-nav">
+    <a href="../index.html" class="lu-brand"><span class="lu-brand-mark">LU</span><span>LEVEL UP</span></a>
+    <ul class="lu-nav-links" id="navLinks">
+        <li><a href="../index.html" class="lu-nav-link">Home</a></li>
+        <li><a href="../about/index.html" class="lu-nav-link">About</a></li>
+        <li><a href="../index.html#games" class="lu-nav-link">Games</a></li>
+        <li><a href="../index.html#pricing" class="lu-nav-link">Pricing</a></li>
+        <li><a href="../Login/index.html" class="lu-nav-link">Login</a></li>
+        <a href="index.html" class="lu-nav-cta">Book Now</a>
+    </ul>
+    <button class="lu-nav-toggle" id="navToggle"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18M3 12h18M3 18h18"/></svg></button>
+</nav>
+
+<main class="lu-container">
+    <section class="booking-header" style="padding-top:40px;">
+        <div class="eyebrow" style="margin-bottom:12px;">Reserve your slot</div>
+        <h1>Book a <span class="text-grad-hot">table</span>.</h1>
+        <p>Pick your game, date, and 30-minute slot. Confirmation is instant.</p>
+    </section>
+
+    <div class="booking-wrap">
+        <!-- LEFT -->
+        <div>
+            <div class="lu-card booking-card">
+                <h3>01 · Choose activity</h3>
+                <div class="activity-chips" id="activityChips"><span class="text-dim" style="font-size:14px;">Loading activities…</span></div>
+            </div>
+            <div class="lu-card booking-card" style="margin-top:20px;">
+                <h3>02 · Pick a date</h3>
+                <div class="calendar">
+                    <div class="cal-head">
+                        <button class="cal-nav-btn" id="calPrev" aria-label="Previous month">‹</button>
+                        <div class="cal-title" id="calTitle">—</div>
+                        <button class="cal-nav-btn" id="calNext" aria-label="Next month">›</button>
+                    </div>
+                    <div class="cal-weekdays"><span>Sun</span><span>Mon</span><span>Tue</span><span>Wed</span><span>Thu</span><span>Fri</span><span>Sat</span></div>
+                    <div class="cal-grid" id="calGrid"></div>
+                </div>
+            </div>
+            <div class="lu-card booking-card slots-section" id="slotsSection" style="margin-top:20px;display:none;">
+                <div class="slots-head">
+                    <h3 style="margin:0;">03 · Choose a time slot</h3>
+                    <div class="slots-legend">
+                        <span><span class="legend-dot avail"></span>Open</span>
+                        <span><span class="legend-dot sel"></span>Picked</span>
+                        <span><span class="legend-dot full"></span>Full</span>
+                    </div>
+                </div>
+                <div class="slots-grid" id="slotsGrid"></div>
+            </div>
+            <div class="lu-card booking-card" id="detailsSection" style="margin-top:20px;display:none;">
+                <h3>04 · Your details</h3>
+                <div class="field">
+                    <label class="lu-label" for="customerName">Name</label>
+                    <input type="text" id="customerName" class="lu-input" placeholder="Your name">
+                </div>
+                <div class="field">
+                    <label class="lu-label" for="customerPhone">Phone (optional)</label>
+                    <input type="tel" id="customerPhone" class="lu-input" placeholder="+91 98765 43210">
+                </div>
+                <button class="lu-btn lu-btn-primary" id="confirmBtn" style="width:100%;">Confirm Booking →</button>
+                <div class="message" id="msg"></div>
+            </div>
+        </div>
+
+        <!-- RIGHT -->
+        <aside>
+            <div class="lu-card summary-card">
+                <div style="font-size:11px;letter-spacing:0.2em;text-transform:uppercase;color:var(--text-mute);font-family:'JetBrains Mono',monospace;">Your booking</div>
+                <h2 style="font-size:26px;margin-top:8px;margin-bottom:20px;" id="sumActivityName">—</h2>
+                <div class="summary-line"><span class="text-dim">Date</span><strong id="sumDate">—</strong></div>
+                <div class="summary-line"><span class="text-dim">Time</span><strong id="sumTime">—</strong></div>
+                <div class="summary-line"><span class="text-dim">Duration</span><strong>30 minutes</strong></div>
+                <div class="summary-line"><span class="text-dim">Table</span><strong id="sumTable">—</strong></div>
+                <div class="summary-total">
+                    <span class="text-dim">Total</span>
+                    <span class="val" id="sumTotal">₹0<small>/ slot</small></span>
+                </div>
+                <div style="margin-top:16px;font-size:12px;color:var(--text-mute);line-height:1.6;">Payment at parlour on arrival. Free cancellation up to 1 hour before.</div>
+            </div>
+        </aside>
+    </div>
+</main>
+
+<footer class="lu-footer">
+    <div>© <span id="year"></span> Level Up Activities</div>
+    <div><a href="../index.html">← Back to home</a></div>
+</footer>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+    const SUPABASE_URL = 'https://fgzejzruaupvbbehjitm.supabase.co';
+    const SUPABASE_KEY = 'sb_publishable_E9c-nQPGpchvgMkOqGql-A_1staD1u7';
+    const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+    document.getElementById('navToggle')?.addEventListener('click', () => document.getElementById('navLinks').classList.toggle('lu-nav-open'));
+    document.getElementById('year').textContent = new Date().getFullYear();
+
+    const state = { activities:[], selectedActivity:null, selectedDate:null, selectedSlot:null, calMonth:new Date(), slotsData:[] };
+    state.calMonth.setDate(1);
+
+    const fmtDateDisplay = d => d ? d.toLocaleDateString('en-IN',{weekday:'short',day:'numeric',month:'short'}) : '—';
+    const fmtDateISO = d => d ? `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}` : '';
+    const fmtTime = t => { if(!t) return '—'; const [h,m]=t.split(':').map(Number); const suf=h>=12?'PM':'AM'; const h12=h%12===0?12:h%12; return `${h12}:${String(m).padStart(2,'0')} ${suf}`; };
+
+    async function loadActivities() {
+        const chipsEl = document.getElementById('activityChips');
+        try {
+            const { data, error } = await sb
+                .from('activities')
+                .select('id, name, total_tables, price_per_slot')
+                .eq('is_active', true)
+                .order('name');
+            if (!error && data && data.length) {
+                state.activities = data.map(a => ({ id: a.id, slug: a.id, name: a.name, total_tables: a.total_tables ?? 1, price_per_slot: a.price_per_slot ?? 200 }));
+            } else throw new Error();
+        } catch(e) {
+            state.activities = [
+                {id:'8-ball-pool',slug:'8-ball-pool',name:'8-Ball Pool',total_tables:1,price_per_slot:200},
+                {id:'fooseball',slug:'fooseball',name:'Foosball',total_tables:1,price_per_slot:150},
+                {id:'airhockey',slug:'airhockey',name:'Air Hockey',total_tables:1,price_per_slot:180},
+            ];
+        }
+        chipsEl.innerHTML = state.activities.map(a=>`<button class="chip" data-id="${a.id}">${a.name} · ₹${a.price_per_slot}</button>`).join('');
+        chipsEl.querySelectorAll('.chip').forEach(c=>c.addEventListener('click',()=>selectActivity(c.dataset.id)));
+        const qp = (new URLSearchParams(location.search).get('activity')||'').toLowerCase();
+        if(qp){ const match=state.activities.find(a=>a.slug===qp||a.id===qp||a.name.toLowerCase().replace(/\s+/g,'-')===qp); if(match) selectActivity(match.id); }
+    }
+
+    function selectActivity(id) {
+        const a = state.activities.find(x=>String(x.id)===String(id)); if(!a) return;
+        state.selectedActivity = a;
+        document.querySelectorAll('#activityChips .chip').forEach(c=>c.classList.toggle('active',String(c.dataset.id)===String(id)));
+        document.getElementById('sumActivityName').textContent = a.name;
+        document.getElementById('sumTable').textContent = `${a.total_tables} available`;
+        updateSummary(); if(state.selectedDate) loadAvailability();
+    }
+
+    function renderCalendar() {
+        const m = state.calMonth;
+        document.getElementById('calTitle').textContent = m.toLocaleDateString('en-IN',{month:'long',year:'numeric'});
+        const today=new Date(); today.setHours(0,0,0,0);
+        const firstDay=new Date(m.getFullYear(),m.getMonth(),1).getDay();
+        const daysInMonth=new Date(m.getFullYear(),m.getMonth()+1,0).getDate();
+        const prevDays=new Date(m.getFullYear(),m.getMonth(),0).getDate();
+        const grid=document.getElementById('calGrid'); let html='';
+        for(let i=firstDay-1;i>=0;i--) html+=`<div class="cal-day out">${prevDays-i}</div>`;
+        for(let d=1;d<=daysInMonth;d++){
+            const date=new Date(m.getFullYear(),m.getMonth(),d);
+            const isToday=date.getTime()===today.getTime(), isPast=date<today, isSel=state.selectedDate&&date.getTime()===state.selectedDate.getTime();
+            const cls=['cal-day']; if(isToday)cls.push('today'); if(isPast)cls.push('past'); if(isSel)cls.push('selected');
+            html+=`<div class="${cls.join(' ')}" data-date="${fmtDateISO(date)}">${d}</div>`;
+        }
+        const trailing=(7-((firstDay+daysInMonth)%7))%7;
+        for(let i=1;i<=trailing;i++) html+=`<div class="cal-day out">${i}</div>`;
+        grid.innerHTML=html;
+        grid.querySelectorAll('.cal-day:not(.out):not(.past)').forEach(el=>el.addEventListener('click',()=>{
+            const [y,mo,da]=el.dataset.date.split('-').map(Number);
+            state.selectedDate=new Date(y,mo-1,da); state.selectedSlot=null;
+            renderCalendar(); updateSummary(); if(state.selectedActivity) loadAvailability();
+        }));
+        const now=new Date();
+        document.getElementById('calPrev').disabled=(m.getFullYear()===now.getFullYear()&&m.getMonth()===now.getMonth());
+    }
+    document.getElementById('calPrev').addEventListener('click',()=>{state.calMonth.setMonth(state.calMonth.getMonth()-1);renderCalendar();});
+    document.getElementById('calNext').addEventListener('click',()=>{state.calMonth.setMonth(state.calMonth.getMonth()+1);renderCalendar();});
+
+    // Generate 12:00–22:30 slots
+    function generateSlotTimes(){const s=[];for(let m=12*60;m<23*60;m+=30){s.push(`${String(Math.floor(m/60)).padStart(2,'0')}:${String(m%60).padStart(2,'0')}`);}return s;}
+    const ALL_SLOTS = generateSlotTimes();
+
+    async function loadAvailability(){
+        if(!state.selectedActivity||!state.selectedDate) return;
+        const section=document.getElementById('slotsSection'), grid=document.getElementById('slotsGrid');
+        section.style.display='block'; grid.innerHTML='<div class="slots-empty">Loading availability…</div>';
+        try {
+            const dateStr = fmtDateISO(state.selectedDate);
+            const { data: existingBookings, error } = await sb
+                .from('bookings')
+                .select('start_time')
+                .eq('activity_id', state.selectedActivity.id)
+                .eq('booking_date', dateStr);
+            if (error) throw error;
+            // Count bookings per slot (Supabase returns TIME as 'HH:MM:SS')
+            const counts = {};
+            (existingBookings || []).forEach(b => {
+                const key = (b.start_time || '').substring(0, 5); // 'HH:MM'
+                counts[key] = (counts[key] || 0) + 1;
+            });
+            const maxTables = state.selectedActivity.total_tables || 1;
+            state.slotsData = ALL_SLOTS.map(t => ({
+                time: t,
+                status: (counts[t] || 0) >= maxTables ? 'Full' : 'Available',
+                tablesAvailable: Math.max(0, maxTables - (counts[t] || 0)),
+            }));
+        } catch(e) {
+            state.slotsData = ALL_SLOTS.map(t => ({ time: t, status: 'Available', tablesAvailable: 1 }));
+        }
+        renderSlots();
+    }
+
+    function renderSlots(){
+        const grid=document.getElementById('slotsGrid');
+        if(!state.slotsData.length){grid.innerHTML='<div class="slots-empty">No slots available.</div>';return;}
+        grid.innerHTML=state.slotsData.map(s=>{
+            const full=s.status==='Full'||s.tablesAvailable===0, sel=s.time===state.selectedSlot;
+            const cls=['slot']; if(full)cls.push('full'); if(sel)cls.push('selected');
+            return `<div class="${cls.join(' ')}" data-time="${s.time}">${fmtTime(s.time)}</div>`;
+        }).join('');
+        grid.querySelectorAll('.slot:not(.full)').forEach(el=>el.addEventListener('click',()=>{
+            state.selectedSlot=el.dataset.time; renderSlots(); updateSummary();
+            document.getElementById('detailsSection').style.display='block';
+        }));
+    }
+
+    function updateSummary(){
+        document.getElementById('sumDate').textContent=fmtDateDisplay(state.selectedDate);
+        document.getElementById('sumTime').textContent=fmtTime(state.selectedSlot);
+        const price=state.selectedActivity?state.selectedActivity.price_per_slot:0;
+        document.getElementById('sumTotal').innerHTML=`₹${price}<small>/ slot</small>`;
+    }
+
+    document.getElementById('confirmBtn').addEventListener('click', async () => {
+        const msg = document.getElementById('msg'); msg.className = 'message';
+        const name = document.getElementById('customerName').value.trim();
+        const phone = document.getElementById('customerPhone').value.trim();
+        if(!state.selectedActivity) return showMsg('Pick an activity first.','error');
+        if(!state.selectedDate) return showMsg('Pick a date.','error');
+        if(!state.selectedSlot) return showMsg('Pick a time slot.','error');
+        if(!name) return showMsg('Please enter your name.','error');
+        try {
+            const dateStr = fmtDateISO(state.selectedDate);
+            const startTime = state.selectedSlot + ':00'; // 'HH:MM:SS'
+
+            // Double-check slot isn't full (race condition guard)
+            const { data: check } = await sb.from('bookings').select('id')
+                .eq('activity_id', state.selectedActivity.id)
+                .eq('booking_date', dateStr)
+                .eq('start_time', startTime);
+            if ((check || []).length >= (state.selectedActivity.total_tables || 1))
+                return showMsg('This slot just got taken! Please pick another.', 'error');
+
+            const { error } = await sb.from('bookings').insert([{
+                activity_id: state.selectedActivity.id,
+                booking_date: dateStr,
+                start_time: startTime,
+                customer_name: name,
+                customer_phone: phone || null,
+            }]);
+            if (error) throw new Error(error.message || 'Booking failed');
+            showMsg(`Booked! ${state.selectedActivity.name} on ${fmtDateDisplay(state.selectedDate)} at ${fmtTime(state.selectedSlot)}. See you there.`, 'success');
+            document.getElementById('confirmBtn').textContent = '✓ Confirmed';
+            document.getElementById('confirmBtn').disabled = true;
+            loadAvailability();
+        } catch(e) { showMsg(e.message || 'Something went wrong', 'error'); }
+    });
+    function showMsg(text,kind){const m=document.getElementById('msg');m.textContent=text;m.className=`message show ${kind}`;}
+
+    loadActivities(); renderCalendar();
+</script>
+</body>
+</html>
