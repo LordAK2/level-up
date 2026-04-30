@@ -12,6 +12,25 @@ const supabaseUrl = process.env.SUPABASE_URL || 'YOUR_SUPABASE_URL';
 const supabaseKey = process.env.SUPABASE_SERVICE_KEY || 'YOUR_SUPABASE_SERVICE_KEY';
 const supabase = createClient(supabaseUrl, supabaseKey);
 
+// ---------- Twilio (SMS confirmation) ----------
+const TWILIO_ACCOUNT_SID  = process.env.TWILIO_ACCOUNT_SID;
+const TWILIO_AUTH_TOKEN   = process.env.TWILIO_AUTH_TOKEN;
+const TWILIO_PHONE_NUMBER = process.env.TWILIO_PHONE_NUMBER;
+
+let twilioClient = null;
+if (TWILIO_ACCOUNT_SID && TWILIO_AUTH_TOKEN && TWILIO_PHONE_NUMBER
+    && !TWILIO_ACCOUNT_SID.includes('YOUR_')) {
+    try {
+        const twilio = require('twilio');
+        twilioClient = twilio(TWILIO_ACCOUNT_SID, TWILIO_AUTH_TOKEN);
+        console.log('✓ Twilio client initialised');
+    } catch (e) {
+        console.warn('Twilio init failed, SMS confirmations will be skipped:', e.message);
+    }
+} else {
+    console.log('ℹ Twilio not configured — SMS confirmations will be skipped (booking flow unaffected)');
+}
+
 // Utility function to generate 30-min time slots from 12:00 PM to 10:30 PM
 const generateTimeSlots = () => {
   const slots = [];
@@ -199,7 +218,35 @@ app.post('/api/bookings', async (req, res) => {
   }
 });
 
-const PORT = process.env.PORT || 3000;
+// =========================================================
+// SMS CONFIRMATION (Twilio)
+// =========================================================
+app.post('/api/send-confirmation', async (req, res) => {
+    try {
+        const { phone, message } = req.body || {};
+        if (!phone || !message) {
+            return res.status(400).json({ sent: false, error: 'phone and message are required' });
+        }
+        const e164 = String(phone).trim();
+        if (!/^\+[1-9]\d{6,14}$/.test(e164)) {
+            return res.status(400).json({ sent: false, error: 'phone must be in E.164 format e.g. +919876543210' });
+        }
+        if (!twilioClient) {
+            return res.json({ sent: false, skipped: true, reason: 'Twilio not configured on server' });
+        }
+        const result = await twilioClient.messages.create({
+            body: String(message).slice(0, 1500),
+            from: TWILIO_PHONE_NUMBER,
+            to: e164,
+        });
+        return res.json({ sent: true, sid: result.sid, status: result.status });
+    } catch (e) {
+        console.error('Twilio send error:', e?.message);
+        return res.status(500).json({ sent: false, error: e?.message || 'SMS send failed' });
+    }
+});
+
+const PORT = process.env.PORT || 3001;
 app.listen(PORT, () => {
   console.log(`Booking API server running on port ${PORT}`);
 });
